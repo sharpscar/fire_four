@@ -11,61 +11,64 @@ import base64
 import socket
 from functools import partial
 
-# --- 스타일 시트 --- #
+
+# 🔥 스타일시트
 STYLESHEET = """
 QWidget {
-    background-color: #2c3e50; /* 전체 배경색 */
-    color: #ecf0f1; /* 전체 텍스트 색상 */
-    font-family: '맑은 고딕', 'Malgun Gothic', 'Helvetica';
+    background-color: #f58220;
+    color: #000000;
+    font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
 }
-
 QFrame#outer_frame {
-    border: 1px solid #34495e;
-    border-radius: 10px;
-    background-color: #34495e; /* 프레임 배경 */
+    background-color: #f58220;
+    border: 2px solid #993d00;
+    border-radius: 12px;
+    padding: 10px;
 }
-
+QLabQLabel#logo_label {
+    background-color: #fef1dc;
+    border: 6px solid #993d00;
+    border-radius: 12px;
+    padding: 8px;
+}
 QLabel#image_label {
-    background-color: #2c3e50; /* 이미지 배경 */
-    border: 1px solid #34495e;
-    border-radius: 6px;
+    background-color: #fef1dc;
+    border: 6px solid #993d00;
+    border-radius: 12px;
+    padding: 12px;
+    color: #000000;
 }
-
 QLabel#info_label {
-    background-color: #2c3e50;
-    border: 1px solid #34495e;
+    background-color: #fff3e0;
+    border: 2px solid #993d00;
     border-radius: 6px;
-    padding: 10px;
-    font-size: 14px;
+    padding: 12px;
+    font-size: 16px;
+    color: #000000;
 }
-
 QPushButton {
-    background-color: #4A78A8; /* PyCharm 테마 블루 */
+    background-color: #e74c3c;
     color: white;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 14px;
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 16px;
     font-weight: bold;
     border: none;
 }
-
 QPushButton:hover {
-    background-color: #3A6898; /* 호버 시 약간 어둡게 */
+    background-color: #c0392b;
 }
-
 QScrollArea {
     border: none;
+    background-color: #ffe0b2;
 }
-
-/* 스크롤바 스타일 */
 QScrollBar:vertical {
     border: none;
-    background: #2c3e50;
+    background: #f58220;
     width: 10px;
-    margin: 0px 0px 0px 0px;
 }
 QScrollBar::handle:vertical {
-    background: #3498db;
+    background: #993d00;
     min-height: 20px;
     border-radius: 5px;
 }
@@ -145,7 +148,7 @@ class ClickableCard(QFrame):
         layout.setSpacing(5)
 
         cam_label = QLabel(f"EVENT {index + 1}")
-        cam_label.setStyleSheet("font-weight: bold; color: #3498db;")
+        cam_label.setStyleSheet("font-weight: bold; color: #fef1dc;")
         time_label = QLabel(time)
         place_label = QLabel(place)
         place_label.setStyleSheet("font-size: 11px; color: #bdc3c7;")
@@ -163,30 +166,31 @@ class ClickableCard(QFrame):
         if is_selected:
             self.setStyleSheet("""
                 #clickable_card {
-                    background-color: #3498db;
-                    border: 1px solid #3498db;
-                    border-radius: 8px;
-                    padding: 5px;
+                    background-color: #f58220;          /* ✅ 주황색 배경 */
+                    border: 2px solid #993d00;          /* ✅ 불갈색 테두리 */
+                    border-radius: 12px;
+                    padding: 8px;
+                    color: #000000;
                 }
             """)
         else:
             self.setStyleSheet("""
                 #clickable_card {
-                    background-color: #2c3e50;
-                    border: 1px solid #34495e;
-                    border-radius: 8px;
-                    padding: 5px;
+                    background-color: #f58220;          /* ✅ 선택 안된 것도 주황색 */
+                    border: 2px solid #993d00;
+                    border-radius: 12px;
+                    padding: 8px;
+                    color: #000000;
                 }
                 #clickable_card:hover {
-                    background-color: #3e566d;
+                    background-color: #ffa64d;          /* ✅ hover 시 밝은 주황 강조 */
                 }
             """)
-
 
 class FireAlertUI(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("화재 출동 알림 시스템 (소방)")
+        self.setWindowTitle("소방서")
         self.setGeometry(100, 100, 1920, 1080)
         self.setStyleSheet(STYLESHEET)
 
@@ -202,13 +206,46 @@ class FireAlertUI(QWidget):
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(15)
 
+        title = QLabel("\U0001F6A8 소방서")
+        title.setFont(QFont("Malgun Gothic", 28, QFont.Bold))
+        title.setAlignment(Qt.AlignCenter)
+        main_layout.addWidget(title)
+
         outer_frame = QFrame()
         outer_frame.setObjectName("outer_frame")
         outer_layout = QHBoxLayout(outer_frame)
         outer_layout.setContentsMargins(10, 10, 10, 10)
         outer_layout.setSpacing(10)
 
-        # 1. 왼쪽 영역 (카드 리스트)
+        # 1. 왼쪽 패널 (로고 + 카드 리스트)
+        left_panel_layout = QVBoxLayout()
+        left_panel_layout.setSpacing(10)
+        left_panel_layout.setAlignment(Qt.AlignTop)  # 상단 정렬
+
+        # police.jpg 이미지 추가
+        police_logo_h_layout = QHBoxLayout()  # 로고를 위한 수평 레이아웃
+        police_logo_h_layout.addStretch(1)  # 좌측에 스트레치 추가
+        self.police_logo_label = QLabel()
+        self.police_logo_label.setObjectName("logo_label")  # ✅ 스타일시트와 매칭되는 이름 설정!
+
+        script_dir = os.path.dirname(__file__)
+        police_image_path = os.path.join(script_dir, "fire_station.png")
+
+        if os.path.exists(police_image_path):
+            pixmap = QPixmap(police_image_path)
+            self.police_logo_label.setPixmap(pixmap.scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.police_logo_label.setAlignment(Qt.AlignCenter)  # QLabel 내부에서 가운데 정렬
+            self.police_logo_label.setFixedSize(300, 300)  # 로고 고정 크기
+        else:
+            self.police_logo_label.setText("FIRE STATION")
+            self.police_logo_label.setAlignment(Qt.AlignCenter)  # QLabel 내부에서 가운데 정렬
+            self.police_logo_label.setFixedSize(300, 300)  # 로고 고정 크기
+            print(f"경고: {police_image_path} 파일을 찾을 수 없습니다. 텍스트로 표시합니다.")
+        police_logo_h_layout.addWidget(self.police_logo_label)
+        police_logo_h_layout.addStretch(1)  # 우측에 스트레치 추가
+        left_panel_layout.addLayout(police_logo_h_layout)
+
+        # 카드 리스트 스크롤 영역
         scroll_area = QScrollArea()
         scroll_content = QWidget()
         self.scroll_layout = QVBoxLayout(scroll_content)
@@ -217,7 +254,9 @@ class FireAlertUI(QWidget):
         scroll_area.setWidget(scroll_content)
         scroll_area.setWidgetResizable(True)
 
-        outer_layout.addWidget(scroll_area, 3)
+        left_panel_layout.addWidget(scroll_area, 1)  # 스크롤 영역이 남은 공간을 차지하도록 stretch
+
+        outer_layout.addLayout(left_panel_layout, 2)  # 좌측 패널 전체의 stretch 조정 (2)
 
         # 2. 중앙 영역 (이미지 + 하단 정보)
         center_layout = QVBoxLayout()
@@ -225,6 +264,15 @@ class FireAlertUI(QWidget):
 
         self.image_label = QLabel("좌측 목록에서 이벤트를 선택하세요.")
         self.image_label.setObjectName("image_label")
+        self.image_label.setStyleSheet("""
+                        #image_label {
+                            background-color: #fef1dc;
+                            border: 6px solid #993d00;
+                            border-radius: 12px;
+                            padding: 12px;
+                            color: #000000;
+                        }
+                    """)
         self.image_label.setAlignment(Qt.AlignCenter)
         self.image_label.setScaledContents(True)  # 이미지 콘텐츠를 라벨 크기에 맞춰 스케일링
         self.image_label.setMinimumSize(600, 450)  # 최소 크기 유지
@@ -255,7 +303,7 @@ class FireAlertUI(QWidget):
         main_layout.addWidget(self.statusLabel, 0, Qt.AlignRight)
 
     def init_network(self):
-        self.receiver_thread = ReceiverThread('10.10.20.109', 10007, self)
+        self.receiver_thread = ReceiverThread('10.10.20.109', 10008, self)
         self.receiver_thread.data_received.connect(self.handle_server_data)
         self.receiver_thread.connection_status.connect(self.update_status)
         self.receiver_thread.start()
@@ -268,7 +316,7 @@ class FireAlertUI(QWidget):
         # ▼▼▼ [추가] JSON 데이터를 파일로 저장하는 부분 ▼▼▼
         try:
             script_dir = os.path.dirname(__file__)
-            file_path = os.path.join(script_dir, "fire_fight.json")
+            file_path = os.path.join(script_dir, "police.json")
             with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(json_data, f, ensure_ascii=False, indent=4)
             print(f"JSON 데이터가 {file_path}에 저장되었습니다.")
@@ -312,7 +360,7 @@ class FireAlertUI(QWidget):
             return
 
         msg_box = QMessageBox(self)
-        msg_box.setStyleSheet("background-color: #34495e; color: white;")
+        msg_box.setStyleSheet("background-color: #34495e; color: black;")
         msg_box.setWindowTitle("출동 완료")
         msg_box.setText("출동을 완료하시겠습니까?\n완료 시 해당 이벤트는 목록에서 제거됩니다.")
         msg_box.setIcon(QMessageBox.Question)
